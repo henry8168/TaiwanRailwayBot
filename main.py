@@ -389,7 +389,6 @@ def initial(table_name2code, car_class_dict):
 
 def release():
     log.TWR_INFO("Release.", "main.release")
-    log.log_clean()
 
 if __name__ == '__main__':
     main()
