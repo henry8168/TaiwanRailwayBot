@@ -37,11 +37,6 @@ def main():
         update_id = update_result[0].update_id
         #update_id = bot.get_updates()[0].update_id
     
-    if log.log_init() < 0:
-        print("main.main log_init() failed.")
-        release()
-        return -1
-    
     schedule_json_list, today_date = get_json_list()
     if initial(station_name2code, car_class_dict) < 0:
         log.TWR_ERR("initial() failed.", "main.main")
