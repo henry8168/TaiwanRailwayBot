@@ -1,7 +1,7 @@
 DEBUG_MODE = 1
 USE_NOTIFY_BOT = False
 Author_UID = 0 # for notify
-BOT_VERSION = "1.0.1"
+BOT_VERSION = "1.0.2"
 PROGRAM_NAME = "Taiwan Railway bot"
 
 KEY_CAR_CLASS_NAME_ZH_TW = "CAR_CLASS_NAME_ZH_TW"

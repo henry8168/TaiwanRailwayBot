@@ -104,6 +104,9 @@ def echo(update, date_str, table_name2code, json_list_t, table_car_class_dict):
         log_msg_postfix = ", UID: {}, username: {}, First name: {}".format(received_uid, received_username, received_firstname)
         received_msg = update.message.text
         if received_msg is None:
+            msg = "奇怪的訊息"
+            update.message.reply_text(msg)
+            log.TWR_INFO(msg+log_msg_postfix, "main.echo")
             return 0
         if received_msg == "/help" or received_msg == "/start":
             log.TWR_INFO(received_msg + log_msg_postfix, "main.echo")
