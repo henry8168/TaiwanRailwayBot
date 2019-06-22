@@ -25,7 +25,6 @@ def main():
     
     # Telegram Bot Authorization Token
     bot = telegram.Bot('xxxxxxxxx:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx') # BotToken
-    # notifier = telegram.Bot('xxxxxxxxx:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx') # Optional: Another bot to notify when crashing.
 
     # get the first pending update_id, this is so we can skip over it in case
     # we get an "Unauthorized" exception.
@@ -75,7 +74,7 @@ def main():
             log.TWR_INFO("Keyboard Exit.")
             break
         except:
-            shutdown_notification(notifier)
+            shutdown_notification(bot)
             break
     release()
     return 0
