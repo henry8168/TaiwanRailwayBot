@@ -73,16 +73,17 @@ def main():
             print("")
             log.TWR_INFO("Keyboard Exit.")
             break
-        except:
-            shutdown_notification(bot)
+        except Exception as e:
+            shutdown_notification(bot, e)
             break
     release()
     return 0
 
-def shutdown_notification(bot):
+def shutdown_notification(bot, e):
     if not USE_NOTIFY_BOT:
         return 0
-    msg = "{} was shut down.".format(PROGRAM_NAME)
+    msg = "[TWR crash] {} was shut down.".format(PROGRAM_NAME)
+    msg += "\n{}".format(e)
     log.TWR_INFO(msg, "main.main")
     bot.send_message(chat_id=Author_UID, 
                      text=msg)
@@ -102,6 +103,11 @@ def echo(update, date_str, table_name2code, json_list_t, table_car_class_dict):
         received_firstname = update.message.chat.first_name
         log_msg_postfix = ", UID: {}, username: {}, First name: {}".format(received_uid, received_username, received_firstname)
         received_msg = update.message.text
+        if received_uid < 0:
+            msg = "不支援群組"
+            # update.message.reply_text(msg)
+            log.TWR_INFO(msg+log_msg_postfix, "main.echo")
+            return 0
         if received_msg is None:
             msg = "奇怪的訊息"
             update.message.reply_text(msg)
