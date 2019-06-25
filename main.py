@@ -163,7 +163,7 @@ def echo(update, date_str, table_name2code, json_list_t, table_car_class_dict):
                             dst_station_time_info = time_info
                             break
                     if src_station_time_info and dst_station_time_info:
-                        reply_train_single_str += "{}  {}  ".format(src_station_time_info["DEPTime"][:-3], dst_station_time_info["DEPTime"][:-3])
+                        reply_train_single_str += "{}  {}  ".format(src_station_time_info["DEPTime"][:-3], dst_station_time_info["ARRTime"][:-3])
                         car_class_result = (table_car_class_dict.get(train_info.get("CarClass")))
                         if car_class_result is None:
                             # log.TWR_ERR("Unknown car class code: {}".format(train_info.get("CarClass")), "main.echo")
