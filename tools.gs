@@ -60,8 +60,6 @@ function send_msg(uid, msg){
 
 function downloadFile2GD(fileName, fileURL, folderId) {
   //Reference from https://stackoverflow.com/questions/55384021/download-file-to-google-drive-folder-using-app-script
-  // fileURL = "http://163.29.3.98/json/20190623.zip"
-  // folderId = '16Max9mocrgt4af_1H4BToZgu7Z1IxeYW'
   
   var response = UrlFetchApp.fetch(fileURL);
   var fileBlob = response.getBlob()
