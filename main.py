@@ -325,7 +325,7 @@ def initial(table_name2code, car_class_dict):
                                 KEY_CAR_CLASS_NAME_EN: "Tze-Chiang Limited Express",
                                 KEY_CAR_CLASS_DESCRIPTION: "DMU2800、2900、3000型柴聯及EMU型電車自強號"
                             }
-    car_class_dict["1101"] = {  KEY_CAR_CLASS_NAME_ZH_TW: "自強號",
+    car_class_dict["1101"] = {  KEY_CAR_CLASS_NAME_ZH_TW: "太魯閣",
                                 KEY_CAR_CLASS_NAME_EN: "Tze-Chiang Limited Express",
                                 KEY_CAR_CLASS_DESCRIPTION: "推拉式自強號"
                             }
