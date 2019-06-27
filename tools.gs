@@ -164,6 +164,70 @@ function str2int(str_t){
   return parseInt(str_t)
 }
 
+function user_config_item2column(item){
+  var col = undefined
+  var len_user_config_items_list = user_config_items_list.length
+  for(var col=0; col<len_user_config_items_list; col++){
+    if(user_config_items_list[col]==item){
+      return col+1
+    }
+  }
+}
+
+function getUserConfigList(uid){
+  var SpreadSheet = SpreadsheetApp.openById(user_info_spreadsheets_id);
+  var Sheet = SpreadSheet.getSheetByName(user_config_sheet_name);
+  var len_user_config_items_list = user_config_items_list.length
+  var start_row = 1
+  var obj_t = Sheet.getSheetValues(start_row, 1, 1, len_user_config_items_list)
+  while(obj_t[0][0] != ""){
+    if(obj_t[0][0] == uid){
+      // log.TWR_DEBUG(obj_t[0])
+      return obj_t[0]
+    }
+    start_row++
+    obj_t = Sheet.getSheetValues(start_row, 1, 1, len_user_config_items_list)
+  }
+  return undefined
+}
+
+function getUserConfigRow(uid){
+  var SpreadSheet = SpreadsheetApp.openById(user_info_spreadsheets_id);
+  var Sheet = SpreadSheet.getSheetByName(user_config_sheet_name);
+  var len_user_config_items_list = user_config_items_list.length
+  var start_row = 1
+  var obj_t = Sheet.getSheetValues(start_row, 1, 1, len_user_config_items_list)
+  while(obj_t[0][0] != ""){
+    if(obj_t[0][0] == uid){
+      // log.TWR_DEBUG(obj_t[0])
+      return start_row
+    }
+    start_row++
+    obj_t = Sheet.getSheetValues(start_row, 1, 1, len_user_config_items_list)
+  }
+  return -1
+}
+
+function setUserConfigVal(row, col, val){
+  var SpreadSheet = SpreadsheetApp.openById(user_info_spreadsheets_id);
+  var Sheet = SpreadSheet.getSheetByName(user_config_sheet_name);
+  Sheet.getRange(row, col).setValue(val)
+  return 0
+}
+
+function max_split_spaces(text){
+  var num = 1
+  var space = ' '
+  var pre_space = ' '
+  while(text.search(space) >= 0){
+    pre_space = space
+    num++
+    space += ' '
+  }
+  return pre_space
+}
+
+
 function isEmpty(obj) {
   return Object.keys(obj).length === 0;
 }

@@ -1,15 +1,5 @@
-var DEBUG_MODE = 1
-var VERSION = "1.0.5"
-var USE_NOTIFY_BOT = true
-
-var Author_UID = YourUID
-var tg_token = 'YourBotToken'
 var telegramUrl = "https://api.telegram.org/bot" + tg_token
-var my_folder_id = 'YourGoogleDriveFolderIdToSaveScheduleJson'
-var my_folder_name = 'schedule_json'
-
-var user_info_spreadsheets_id = "YourGoogleDriveSpreadSheetsIdToRecordUser"
-var user_using_record_sheet_name = "user using record"
+var user_config_items_list = ["uid", "last_valid_input", "show_only_next_20_classes"]
 
 var PROGRAM_NAME = "Taiwan Railway bot"
 
@@ -30,4 +20,3 @@ ex: 桃園 台北\n\
 \n\
 資料來源: https://data.gov.tw/dataset/6138\n\
 開發者: @HenryLab\n"
-
