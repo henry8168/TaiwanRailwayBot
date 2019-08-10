@@ -40,11 +40,16 @@ function echo(update, today_date, table_name2code, json_list_t, car_class_dict){
     ret = -1
   }
   else if(update.message){  // your bot can receive updates without messages
-    var received_uid = update.message.chat.id
-    var received_username = update.message.chat.username
-    var received_firstname = update.message.chat.first_name
-    var log_msg_postfix = ", UID: "+received_uid+", username: "+received_username+", First name: "+received_firstname
+    var received_uid = undefined
+    var received_username = undefined
+    var received_firstname = undefined
     var received_msg = update.message.text
+    if(update.message.chat){
+      received_uid = update.message.chat.id
+      received_username = update.message.chat.username
+      received_firstname = update.message.chat.first_name
+    }
+    var log_msg_postfix = ", UID: "+received_uid+", username: "+received_username+", First name: "+received_firstname
     var msg = ""
     if(received_uid < 0){
       msg = "不支援群組"
