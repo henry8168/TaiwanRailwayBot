@@ -4,6 +4,13 @@ var car_class_dict = {}
 function doPost(e){
   try {
     var update = JSON.parse(e.postData.contents);
+    if(update.message){
+      var received_msg = update.message.text
+      if(received_msg && update.message.chat){
+        var received_uid = update.message.chat.id
+        send_msg(received_uid, "收到訊息，開始處理...")
+      }
+    }
     check_and_download_json()
     var today_date = get_date_num_str()
     if(isEmpty(schedule_json_list)){
