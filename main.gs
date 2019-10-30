@@ -3,12 +3,14 @@ var station_name2code = {}
 var car_class_dict = {}
 function doPost(e){
   try {
+    var alert_received_msg = undefined
+    var received_uid = undefined
     var update = JSON.parse(e.postData.contents);
     if(update.message){
       var received_msg = update.message.text
       if(received_msg && update.message.chat){
         var received_uid = update.message.chat.id
-        send_msg(received_uid, "收到訊息，開始處理...")
+        alert_received_msg = send_msg(received_uid, "收到訊息，開始處理...")
       }
     }
     check_and_download_json()
@@ -27,6 +29,9 @@ function doPost(e){
       release()
       return -1
     }
+    if(received_uid && alert_received_msg){
+      delete_msg(received_uid, alert_received_msg)
+    }
   }
   catch (err){
     log.TWR_ERR(err, "doPost");
@@ -35,8 +40,6 @@ function doPost(e){
 }
 
 function echo(update, today_date, table_name2code, json_list_t, car_class_dict){
-  var received_msg = update.message.text
-  var received_uid = update.message.chat.id
   var ret = 0
   if(typeof table_name2code != "object"){
     log.TWR_ERR("Wrong table_name2code type.", "main.echo")
@@ -51,12 +54,15 @@ function echo(update, today_date, table_name2code, json_list_t, car_class_dict){
     var received_username = undefined
     var received_firstname = undefined
     var received_msg = update.message.text
+    
     if(update.message.chat){
       received_uid = update.message.chat.id
       received_username = update.message.chat.username
       received_firstname = update.message.chat.first_name
     }
+    
     var log_msg_postfix = ", UID: "+received_uid+", username: "+received_username+", First name: "+received_firstname
+    
     var msg = ""
     if(received_uid < 0){
       msg = "不支援群組"
@@ -171,6 +177,7 @@ function echo(update, today_date, table_name2code, json_list_t, car_class_dict){
           }
         }
         var sorted_reply_train_msg_list = reply_train_msg_list_to_dict(reply_train_msg_list)
+        var sent_classes_count = 0
         if(isEmpty(sorted_reply_train_msg_list)){
           msg = "查無班次"
           log.TWR_INFO(msg)
@@ -190,7 +197,6 @@ function echo(update, today_date, table_name2code, json_list_t, car_class_dict){
           else{
             shown_max_classes = len_reply_train_msg_list
           }
-          var sent_classes_count = 0
           for(var index=0; index<shown_max_classes; index++){
             if(index>0 && index%20 == 0){
               var len_reply_train_msg_str = reply_train_msg_str.length
@@ -477,15 +483,4 @@ function initial(table_name2code, car_class_dict){
 
 function release(){
   log.TWR_INFO("Release.", "main.release")
-}
-
-function debug(){
-  var num = 1
-  var space = ' '
-  var text = "桃園台北"
-  while(text.search(space) >= 0){
-    num++
-    space += ' '
-  }
-  log.TWR_DEBUG(num-1)
 }
