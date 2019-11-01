@@ -227,6 +227,18 @@ function max_split_spaces(text){
   return pre_space
 }
 
+function setWebhook(){
+  var botToken = tg_token
+  var appUrl = "https://script.google.com/macros/s/xxxxxxxxxxxxxxxxxx/exec"
+  response = UrlFetchApp.fetch("https://api.telegram.org/bot"+botToken+"/setWebhook?url="+appUrl)
+  log.TWR_DEBUG(response)
+}
+
+function deleteWebhook(){
+  var botToken = tg_token
+  response = UrlFetchApp.fetch("https://api.telegram.org/bot"+botToken+"/setWebhook?url=")
+  log.TWR_DEBUG(response)
+}
 
 function isEmpty(obj) {
   return Object.keys(obj).length === 0;
