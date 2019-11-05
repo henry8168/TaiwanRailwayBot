@@ -33,6 +33,32 @@ function get_date_num_str(dayoffset){
   return datestamp;
 }
 
+function retryFetch(url, retry_times, option){
+  var max_times = 3
+  var response = undefined
+  if(retry_times){
+    max_times = retry_times
+  }
+  var count = 0
+  while(count < max_times){
+    try{
+      if(option){
+        response = UrlFetchApp.fetch(url, option);
+      }
+      else{
+        response = UrlFetchApp.fetch(url);
+      }
+      return response
+    }
+    catch (err){
+      count++;
+      sleep(1000)
+    }
+  }
+  log.ERR("網頁不可用: "+url, "tools.retryFetch")
+  return undefined;
+}
+
 function record_user(update){
   var SpreadSheet = SpreadsheetApp.openById(user_info_spreadsheets_id);
   var Sheet = SpreadSheet.getSheetByName(user_using_record_sheet_name);
@@ -55,6 +81,12 @@ function record_user(update){
 
 function send_msg(uid, msg){
   var response = UrlFetchApp.fetch("https://api.telegram.org/bot" + tg_token + "/sendMessage?text=" + encodeURIComponent(msg) + "&chat_id=" + uid + "&parse_mode=HTML");
+  return response
+}
+
+function delete_msg(uid, message){
+  var sent_message_dict = JSON.parse(message.getContentText())
+  var response = UrlFetchApp.fetch("https://api.telegram.org/bot" + tg_token + "/deleteMessage?message_id=" + sent_message_dict.result.message_id + "&chat_id=" + uid + "&parse_mode=HTML");
   return response
 }
 
@@ -229,7 +261,7 @@ function max_split_spaces(text){
 
 function setWebhook(){
   var botToken = tg_token
-  var appUrl = "https://script.google.com/macros/s/xxxxxxxxxxxxxxxxxx/exec"
+  var appUrl = "https://script.google.com/macros/s/AKfycbwPBt0WAwMKY9K8T0-4DS_x2IYHnWGsZ6n8lq_XzkxEvkPFO7Ui/exec"
   response = UrlFetchApp.fetch("https://api.telegram.org/bot"+botToken+"/setWebhook?url="+appUrl)
   log.TWR_DEBUG(response)
 }
