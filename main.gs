@@ -300,9 +300,6 @@ function get_json_file_url(file_name){
     right_quotation_mark_index += left_quotation_mark_index+1
     return taiwan_railway_administration_url + target_line.slice(left_quotation_mark_index+1, right_quotation_mark_index)
 }
-    
-    
-    
 
 function get_json_list(){
   today_file_date = get_date_num_str()
@@ -343,11 +340,8 @@ function setup_station_code_dict(table){
   }
     
   var stations_code_url = "https://tip.railway.gov.tw/tra-tip-web/tip/tip001/tip111/view"
-  var response = undefined
-  try{
-    response = UrlFetchApp.fetch(stations_code_url);
-  }
-  catch (err){
+  var response = retryFetch(stations_code_url)
+  if(!response){
     var msg = "政府網站目前不可用： "+stations_code_url
     log.TWR_DEBUG(msg, "main.setup_station_code_dict")
     send_msg(Author_UID, msg)
@@ -483,4 +477,9 @@ function initial(table_name2code, car_class_dict){
 
 function release(){
   log.TWR_INFO("Release.", "main.release")
+}
+
+function debug(){
+  var sent_message = send_msg(Author_UID, "測試測試OKOK")
+  delete_msg(Author_UID, sent_message)
 }
