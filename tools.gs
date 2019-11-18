@@ -88,8 +88,10 @@ function record_user(update){
 }
 
 function send_msg(uid, msg){
-  var response = UrlFetchApp.fetch("https://api.telegram.org/bot" + tg_token + "/sendMessage?text=" + encodeURIComponent(msg) + "&chat_id=" + uid + "&parse_mode=HTML");
-  return response
+  if(!retryFetch("https://api.telegram.org/bot" + tg_token + "/sendMessage?text=" + encodeURIComponent(msg) + "&chat_id=" + uid + "&parse_mode=HTML")){
+    log.ERR("retryFetch() failed", "tools.send_msg")
+    return -1
+  }
 }
 
 function delete_msg(uid, message){
@@ -177,11 +179,19 @@ function check_and_download_json(){
     schedule_json_list = []
     log.TWR_INFO("JSON file today was not found. Start to download "+ today_json_name)
     file_url = get_json_file_url(today_json_name)
+    if(file_url == ""){
+      log.TWR_ERR("get_json_file_url() filed", "tools.check_and_download_json")
+      return -1
+    }
     downloadFile2GD(today_json_name, file_url, my_folder_id)
   }
   else if(!isFileExists(tomorrow_json_name, my_folder_id)){
     log.TWR_INFO("JSON file tomorrow was not found. Start to download "+tomorrow_json_name)
     file_url = get_json_file_url(tomorrow_json_name)
+    if(file_url==""){
+      log.TWR_ERR("get_json_file_url() failed", "tools.check_and_download_json")
+      return -1
+    }
     downloadFile2GD(tomorrow_json_name, file_url, my_folder_id)
   }
   else{
