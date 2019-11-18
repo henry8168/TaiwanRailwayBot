@@ -281,7 +281,9 @@ function get_json_file_url(file_name){
     var json_list_url = taiwan_railway_administration_url + "/tra-ods-web/ods/download/dataResource/railway_schedule/JSON/list"
     var response = retryFetch(json_list_url)
     if(!response){
-      log.TWR_ERR("Access failed. url: "+json_list_url, "main.get_json_file_url")
+      msg = "Access failed. url: "+json_list_url
+      log.TWR_ERR(msg, "main.get_json_file_url")
+      crash_notification(msg)
       return ""
     }
     var html = response.getContentText()
