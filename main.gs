@@ -279,7 +279,11 @@ function reply_train_msg_list_to_dict(msg_list){
 function get_json_file_url(file_name){
     var taiwan_railway_administration_url = "https://ods.railway.gov.tw"
     var json_list_url = taiwan_railway_administration_url + "/tra-ods-web/ods/download/dataResource/railway_schedule/JSON/list"
-    var response = UrlFetchApp.fetch(json_list_url);
+    var response = retryFetch(json_list_url)
+    if(!response){
+      log.TWR_ERR("Access failed. url: "+json_list_url, "main.get_json_file_url")
+      return ""
+    }
     var html = response.getContentText()
     var html_list = html.split('\n')
     var target_line = ""
