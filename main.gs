@@ -13,7 +13,12 @@ function doPost(e){
         alert_received_msg = send_msg(received_uid, "收到訊息，開始處理...")
       }
     }
-    check_and_download_json()
+    if(check_and_download_json() < 0){
+      msg = "台鐵網頁失效"
+      log.TWR_ERR(msg, "main.doPost")
+      send_msg(received_uid, msg)
+      crash_notification(msg)
+    }
     var today_date = get_date_num_str()
     if(isEmpty(schedule_json_list)){
       schedule_json_list = get_json_list()
