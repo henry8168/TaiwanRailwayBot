@@ -33,6 +33,14 @@ function get_date_num_str(dayoffset){
   return datestamp;
 }
 
+function sleep(milliseconds) 
+{ 
+  var start = new Date().getTime(); 
+  while(1)
+    if ((new Date().getTime() - start) > milliseconds)
+      break;
+}
+
 function retryFetch(url, retry_times, option){
   var max_times = 3
   var response = undefined
@@ -55,7 +63,7 @@ function retryFetch(url, retry_times, option){
       sleep(1000)
     }
   }
-  log.ERR("網頁不可用: "+url, "tools.retryFetch")
+  log.TWR_ERR("網頁不可用: "+url, "tools.retryFetch")
   return undefined;
 }
 
