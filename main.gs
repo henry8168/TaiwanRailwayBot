@@ -3,6 +3,7 @@ var station_name2code = {}
 var car_class_dict = {}
 function doPost(e){
   try {
+    var ret = 0
     var alert_received_msg = undefined
     var received_uid = undefined
     var update = JSON.parse(e.postData.contents);
@@ -13,10 +14,13 @@ function doPost(e){
         alert_received_msg = send_msg(received_uid, "收到訊息，開始處理...")
       }
     }
-    if(check_and_download_json() < 0){
+    ret = check_and_download_json()
+    if(ret < 0){
       msg = "台鐵網頁失效"
-      log.TWR_ERR(msg, "main.doPost")
-      send_msg(received_uid, msg)
+      log.TWR_ERR(msg+"ret="+ret, "main.doPost")
+      if(ret==-1){
+        send_msg(received_uid, msg)
+      }
       crash_notification(msg)
     }
     var today_date = get_date_num_str()
