@@ -10,7 +10,7 @@ function doPost(e){
     if(update.message){
       var received_msg = update.message.text
       if(received_msg && update.message.chat){
-        var received_uid = update.message.chat.id
+        received_uid = update.message.chat.id
         alert_received_msg = send_msg(received_uid, "收到訊息，開始處理...")
       }
     }
