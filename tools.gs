@@ -88,10 +88,12 @@ function record_user(update){
 }
 
 function send_msg(uid, msg){
-  if(!retryFetch("https://api.telegram.org/bot" + tg_token + "/sendMessage?text=" + encodeURIComponent(msg) + "&chat_id=" + uid + "&parse_mode=HTML")){
+  var res = retryFetch("https://api.telegram.org/bot" + tg_token + "/sendMessage?text=" + encodeURIComponent(msg) + "&chat_id=" + uid + "&parse_mode=HTML")
+  if(!res){
     log.ERR("retryFetch() failed", "tools.send_msg")
-    return -1
+    return {}
   }
+  return res
 }
 
 function delete_msg(uid, message){
