@@ -20,6 +20,7 @@ function doPost(e){
       log.TWR_ERR(msg+"ret="+ret, "main.doPost")
       if(ret==-1){
         send_msg(received_uid, msg)
+        return -1
       }
       crash_notification(msg)
     }
