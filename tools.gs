@@ -179,8 +179,8 @@ function check_and_download_json(){
     schedule_json_list = []
     log.TWR_INFO("JSON file today was not found. Start to download "+ today_json_name)
     file_url = get_json_file_url(today_json_name)
-    if(file_url == ""){
-      log.TWR_ERR("get_json_file_url() filed", "tools.check_and_download_json")
+    if(isEmpty(file_url)){
+      log.TWR_ERR("get_json_file_url() filed 1", "tools.check_and_download_json")
       return -1
     }
     downloadFile2GD(today_json_name, file_url, my_folder_id)
@@ -188,9 +188,9 @@ function check_and_download_json(){
   else if(!isFileExists(tomorrow_json_name, my_folder_id)){
     log.TWR_INFO("JSON file tomorrow was not found. Start to download "+tomorrow_json_name)
     file_url = get_json_file_url(tomorrow_json_name)
-    if(file_url==""){
-      log.TWR_ERR("get_json_file_url() failed", "tools.check_and_download_json")
-      return -1
+    if(isEmpty(file_url)){
+      log.TWR_ERR("get_json_file_url() failed 2", "tools.check_and_download_json")
+      return -2
     }
     downloadFile2GD(tomorrow_json_name, file_url, my_folder_id)
   }
