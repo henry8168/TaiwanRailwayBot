@@ -41,7 +41,7 @@ function sleep(milliseconds)
       break;
 }
 
-function retryFetch(url, retry_times, option){
+function retryFetch(url, option, retry_times){
   var max_times = 3
   var response = undefined
   if(retry_times){
