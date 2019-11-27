@@ -88,7 +88,16 @@ function record_user(update){
 }
 
 function send_msg(uid, msg){
-  var res = retryFetch("https://api.telegram.org/bot" + tg_token + "/sendMessage?text=" + encodeURIComponent(msg) + "&chat_id=" + uid + "&parse_mode=HTML")
+  var payload = {
+    "method": "sendMessage",
+    "chat_id": String(uid),
+    "text": msg
+  }
+  var data = {
+    "method": "post",
+    "payload": payload
+  }
+  var res = retryFetch("https://api.telegram.org/bot"+tg_token+"/", data);
   if(!res){
     log.ERR("retryFetch() failed", "tools.send_msg")
     return {}
