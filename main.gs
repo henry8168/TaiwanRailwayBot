@@ -138,6 +138,7 @@ function echo(update, today_date, table_name2code, json_list_t, car_class_dict){
                 ret = 0
       }
       else{
+		var will_show_only_next_20_classes = this_user_config_list[user_config_item2column("show_only_next_20_classes")-1]
         msg = "收到訊息: "+received_msg
         var log_msg = msg + log_msg_postfix
         log.TWR_INFO(log_msg, "main.echo")
@@ -186,7 +187,7 @@ function echo(update, today_date, table_name2code, json_list_t, car_class_dict){
             return -1
           }
         }
-        var sorted_reply_train_msg_list = reply_train_msg_list_to_dict(reply_train_msg_list)
+        var sorted_reply_train_msg_list = reply_train_msg_list_to_dict(reply_train_msg_list, will_show_only_next_20_classes)
         var sent_classes_count = 0
         if(isEmpty(sorted_reply_train_msg_list)){
           msg = "查無班次"
@@ -195,7 +196,6 @@ function echo(update, today_date, table_name2code, json_list_t, car_class_dict){
           ret = 0
         }
         else{
-          var will_show_only_next_20_classes = this_user_config_list[user_config_item2column("show_only_next_20_classes")-1]
           var head_str = today_date.slice(0,4)+"/"+today_date.slice(4,6)+"/"+today_date.slice(6,8)+"\n"+src_station_name+" -> "+dst_station_name
           // log.TWR_INFO("Reply the train info: ")
           // log.TWR_DEBUG(sorted_reply_train_msg_list)
@@ -247,7 +247,7 @@ function echo(update, today_date, table_name2code, json_list_t, car_class_dict){
   return ret
 }
 
-function reply_train_msg_list_to_dict(msg_list){
+function reply_train_msg_list_to_dict(msg_list, is_show_less){
   var msg_dict = {}
   var ordered_msg_list = []
   var len_msg_list = msg_list.length
@@ -276,8 +276,10 @@ function reply_train_msg_list_to_dict(msg_list){
   for(var i=0; i<2400; i+=100){
     for(var j=0; j<60; j++){
       key = i+j
-      if((key in msg_dict) && key >= time_int){
-        ordered_msg_list.push(msg_dict[key])
+      if((key in msg_dict)){
+		if(key >= time_int || !is_show_less){
+			ordered_msg_list.push(msg_dict[key])
+		}
       }
     }
   }
