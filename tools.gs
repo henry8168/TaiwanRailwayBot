@@ -99,7 +99,7 @@ function send_msg(uid, msg){
   }
   var res = retryFetch("https://api.telegram.org/bot"+tg_token+"/", data);
   if(!res){
-    log.ERR("retryFetch() failed", "tools.send_msg")
+    log.TWR_ERR("retryFetch() failed", "tools.send_msg")
     return {}
   }
   return res
