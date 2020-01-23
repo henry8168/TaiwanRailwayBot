@@ -95,152 +95,145 @@ function echo(update, today_date, table_name2code, json_list_t, car_class_dict){
       //處理完成
       ContentService.createTextOutput(true);
     }
-    if(received_msg.search("/help") == 0 || received_msg.search("/start") == 0){
-      log.TWR_INFO(received_msg + log_msg_postfix, "main.echo")
-      send_msg(received_uid, help_msg)
+    // show all or show less
+    if(received_msg.search("/show_less") == 0 || received_msg.search("/show_all") == 0){
+      user_config_row = getUserConfigRow(received_uid)
+      setUserConfigVal(user_config_row, user_config_item2column("show_only_next_20_classes"), received_msg.search("/show_less")==0)
+      this_user_config_list = getUserConfigList(received_uid)
+      var last_valid_input = this_user_config_list[user_config_item2column("last_valid_input")-1]
+      input_stations = last_valid_input.split(max_split_spaces(last_valid_input))
+    }
+    else{
+      input_stations = received_msg.split(max_split_spaces(received_msg))
+    }
+    
+    // Reply to the message
+    len_input_stations = input_stations.length
+    if(len_input_stations > 2 || len_input_stations < 2){
+      msg = "車站數不正確，請輸入兩個車站名。訊息: "+received_msg
+      send_msg(received_uid, msg)
+      log_msg = msg + log_msg_postfix
+      log.TWR_ERR(log_msg, "main.echo")
+      ret = 0
+    }
+    else if(!(input_stations[0] in table_name2code) || !(input_stations[1] in table_name2code)){
+      msg = "查無車站名稱，請輸入兩站正確的車站。訊息: "+received_msg
+      send_msg(received_uid, msg)
+      log_msg = msg + log_msg_postfix
+      log.TWR_ERR(log_msg, "main.echo")
+      ret = 0
+    }
+    else if(table_name2code[input_stations[0]] == table_name2code[input_stations[1]]){
+      msg = "相同的車站，請輸入兩個不同車站。訊息: "+received_msg
+      send_msg(received_uid, msg)
+      log_msg = msg + log_msg_postfix
+      log.TWR_ERR(log_msg, "main.echo")
       ret = 0
     }
     else{
-      // show all or show less
-      if(received_msg.search("/show_less") == 0 || received_msg.search("/show_all") == 0){
-        user_config_row = getUserConfigRow(received_uid)
-        setUserConfigVal(user_config_row, user_config_item2column("show_only_next_20_classes"), received_msg.search("/show_less")==0)
-        this_user_config_list = getUserConfigList(received_uid)
-        var last_valid_input = this_user_config_list[user_config_item2column("last_valid_input")-1]
-        input_stations = last_valid_input.split(max_split_spaces(last_valid_input))
-      }
-      else{
-        input_stations = received_msg.split(max_split_spaces(received_msg))
-      }
+      var will_show_only_next_20_classes = this_user_config_list[user_config_item2column("show_only_next_20_classes")-1]
+      msg = "收到訊息: "+received_msg
+      var log_msg = msg + log_msg_postfix
+      log.TWR_INFO(log_msg, "main.echo")
       
-      // Reply to the message
-      len_input_stations = input_stations.length
-      if(len_input_stations > 2 || len_input_stations < 2){
-                msg = "車站數不正確，請輸入兩個車站名。訊息: "+received_msg
-                send_msg(received_uid, msg)
-                log_msg = msg + log_msg_postfix
-                log.TWR_ERR(log_msg, "main.echo")
-                ret = 0
-      }
-      else if(!(input_stations[0] in table_name2code) || !(input_stations[1] in table_name2code)){
-                msg = "查無車站名稱，請輸入兩站正確的車站。訊息: "+received_msg
-                send_msg(received_uid, msg)
-                log_msg = msg + log_msg_postfix
-                log.TWR_ERR(log_msg, "main.echo")
-                ret = 0
-      }
-      else if(table_name2code[input_stations[0]] == table_name2code[input_stations[1]]){
-                msg = "相同的車站，請輸入兩個不同車站。訊息: "+received_msg
-                send_msg(received_uid, msg)
-                log_msg = msg + log_msg_postfix
-                log.TWR_ERR(log_msg, "main.echo")
-                ret = 0
-      }
-      else{
-		var will_show_only_next_20_classes = this_user_config_list[user_config_item2column("show_only_next_20_classes")-1]
-        msg = "收到訊息: "+received_msg
-        var log_msg = msg + log_msg_postfix
-        log.TWR_INFO(log_msg, "main.echo")
-        
-        var len_json_list_t = json_list_t.length
-        var src_station_name = input_stations[0]
-        var dst_station_name = input_stations[1]
-        var src_station_code = table_name2code[src_station_name]
-        var dst_station_code = table_name2code[dst_station_name]
-        var reply_train_msg_list = []
-        var reply_train_msg_str = ""
-        
-        for(var indexi=0; indexi<len_json_list_t; indexi++){
-          var reply_train_single_str = ""
-          var src_station_time_info = {}
-          var dst_station_time_info = {}
-          var len_json_list_t_indexi_TimeInfos = json_list_t[indexi]["TimeInfos"].length
-          for(var indexj=0; indexj<len_json_list_t_indexi_TimeInfos; indexj++){
-            if(isEmpty(src_station_time_info) && (json_list_t[indexi]["TimeInfos"][indexj]["Station"] == src_station_code)){
-              src_station_time_info = json_list_t[indexi]["TimeInfos"][indexj]
-            }
-            else if(!isEmpty(src_station_time_info) && isEmpty(dst_station_time_info) && json_list_t[indexi]["TimeInfos"][indexj]["Station"] == dst_station_code){
-              dst_station_time_info = json_list_t[indexi]["TimeInfos"][indexj]
-              break
-            }
+      var len_json_list_t = json_list_t.length
+      var src_station_name = input_stations[0]
+      var dst_station_name = input_stations[1]
+      var src_station_code = table_name2code[src_station_name]
+      var dst_station_code = table_name2code[dst_station_name]
+      var reply_train_msg_list = []
+      var reply_train_msg_str = ""
+      
+      for(var indexi=0; indexi<len_json_list_t; indexi++){
+        var reply_train_single_str = ""
+        var src_station_time_info = {}
+        var dst_station_time_info = {}
+        var len_json_list_t_indexi_TimeInfos = json_list_t[indexi]["TimeInfos"].length
+        for(var indexj=0; indexj<len_json_list_t_indexi_TimeInfos; indexj++){
+          if(isEmpty(src_station_time_info) && (json_list_t[indexi]["TimeInfos"][indexj]["Station"] == src_station_code)){
+            src_station_time_info = json_list_t[indexi]["TimeInfos"][indexj]
           }
-          if(!isEmpty(src_station_time_info) && !isEmpty(dst_station_time_info)){
-            var len_src_station_time_info_DEPTime = src_station_time_info["DEPTime"].length
-            var len_dst_station_time_info_DEPTime = dst_station_time_info["ARRTime"].length
-            reply_train_single_str += src_station_time_info["DEPTime"].slice(0, len_src_station_time_info_DEPTime-3)+"  "+dst_station_time_info["ARRTime"].slice(0, len_dst_station_time_info_DEPTime-3)+"  "
-            var car_class_result = (car_class_dict[json_list_t[indexi]["CarClass"]])
-            if(car_class_result==undefined){
-              car_class_code_str = json_list_t[indexi]["CarClass"]
-              reply_train_single_str += car_class_code_str
-            }
-            else{
-              var car_class_name_str = car_class_result["KEY_CAR_CLASS_NAME_ZH_TW"]
-              reply_train_single_str += car_class_name_str
-            }
-            reply_train_msg_list.push(reply_train_single_str)
+          else if(!isEmpty(src_station_time_info) && isEmpty(dst_station_time_info) && json_list_t[indexi]["TimeInfos"][indexj]["Station"] == dst_station_code){
+            dst_station_time_info = json_list_t[indexi]["TimeInfos"][indexj]
+            break
           }
         }
-        if(received_uid != Author_UID){
-          if(record_user(update) < 0){
-            log.TWR_ERR("append_user_info() failed.", "main.echo")
-            return -1
-          }
-        }
-        var sorted_reply_train_msg_list = reply_train_msg_list_to_dict(reply_train_msg_list, will_show_only_next_20_classes)
-        var sent_classes_count = 0
-        if(isEmpty(sorted_reply_train_msg_list)){
-          msg = "查無班次"
-          log.TWR_INFO(msg)
-          send_msg(received_uid, msg)
-          ret = 0
-        }
-        else{
-          var head_str = today_date.slice(0,4)+"/"+today_date.slice(4,6)+"/"+today_date.slice(6,8)+"\n"+src_station_name+" -> "+dst_station_name
-          // log.TWR_INFO("Reply the train info: ")
-          // log.TWR_DEBUG(sorted_reply_train_msg_list)
-          var len_reply_train_msg_list = sorted_reply_train_msg_list.length
-          var shown_max_classes = -1
-          if(will_show_only_next_20_classes && len_reply_train_msg_list > 20){
-            shown_max_classes = 20
+        if(!isEmpty(src_station_time_info) && !isEmpty(dst_station_time_info)){
+          var len_src_station_time_info_DEPTime = src_station_time_info["DEPTime"].length
+          var len_dst_station_time_info_DEPTime = dst_station_time_info["ARRTime"].length
+          reply_train_single_str += src_station_time_info["DEPTime"].slice(0, len_src_station_time_info_DEPTime-3)+"  "+dst_station_time_info["ARRTime"].slice(0, len_dst_station_time_info_DEPTime-3)+"  "
+          var car_class_result = (car_class_dict[json_list_t[indexi]["CarClass"]])
+          if(car_class_result==undefined){
+            car_class_code_str = json_list_t[indexi]["CarClass"]
+            reply_train_single_str += car_class_code_str
           }
           else{
-            shown_max_classes = len_reply_train_msg_list
+            var car_class_name_str = car_class_result["KEY_CAR_CLASS_NAME_ZH_TW"]
+            reply_train_single_str += car_class_name_str
           }
-          for(var index=0; index<shown_max_classes; index++){
-            if(index>0 && index%20 == 0){
-              var len_reply_train_msg_str = reply_train_msg_str.length
-              var reply_train_msg_str = reply_train_msg_str.slice(0, len_reply_train_msg_str-1)
-              // log.TWR_INFO("\n"+head_str+"\n"+reply_train_msg_str)
-              send_msg(received_uid, head_str+'\n'+reply_train_msg_str)
-              reply_train_msg_str = ""
-            }
-            reply_train_msg_str += (sorted_reply_train_msg_list[index]+"\n")
-            sent_classes_count+=1
-          }
-          if(reply_train_msg_str){
-            var len_reply_train_msg_str = reply_train_msg_str.length
-            reply_train_msg_str = head_str+'\n'+reply_train_msg_str.slice(0, len_reply_train_msg_str-1)
-            // log.TWR_INFO("\n"+reply_train_msg_str)
-            send_msg(received_uid, reply_train_msg_str)
-          }
-          ret = 0
+          reply_train_msg_list.push(reply_train_single_str)
         }
-        
-        log.TWR_INFO(sent_classes_count+" class(es) were sent to the user."+log_msg_postfix)
-        if(received_msg.search("/")<0){
-          if(setUserConfigVal(getUserConfigRow(received_uid), user_config_item2column("last_valid_input"), received_msg) < 0){
-            log.TWR_ERR("setUserConfigVal() failed.", "main.echo")
-            return -1
-          }
+      }
+      if(received_uid != Author_UID){
+        if(record_user(update) < 0){
+          log.TWR_ERR("append_user_info() failed.", "main.echo")
+          return -1
         }
-        if(this_user_config_list[user_config_item2column("show_only_next_20_classes")-1]){
-          msg = "顯示全部? /show_all"
+      }
+      var sorted_reply_train_msg_list = reply_train_msg_list_to_dict(reply_train_msg_list, will_show_only_next_20_classes)
+      var sent_classes_count = 0
+      if(isEmpty(sorted_reply_train_msg_list)){
+        msg = "查無班次"
+        log.TWR_INFO(msg)
+        send_msg(received_uid, msg)
+        ret = 0
+      }
+      else{
+        var head_str = today_date.slice(0,4)+"/"+today_date.slice(4,6)+"/"+today_date.slice(6,8)+"\n"+src_station_name+" -> "+dst_station_name
+        // log.TWR_INFO("Reply the train info: ")
+        // log.TWR_DEBUG(sorted_reply_train_msg_list)
+        var len_reply_train_msg_list = sorted_reply_train_msg_list.length
+        var shown_max_classes = -1
+        if(will_show_only_next_20_classes && len_reply_train_msg_list > 20){
+          shown_max_classes = 20
         }
         else{
-          msg = "只顯示最多 20 班? /show_less"
+          shown_max_classes = len_reply_train_msg_list
         }
-        send_msg(received_uid, msg)
+        for(var index=0; index<shown_max_classes; index++){
+          if(index>0 && index%20 == 0){
+            var len_reply_train_msg_str = reply_train_msg_str.length
+            var reply_train_msg_str = reply_train_msg_str.slice(0, len_reply_train_msg_str-1)
+            // log.TWR_INFO("\n"+head_str+"\n"+reply_train_msg_str)
+            send_msg(received_uid, head_str+'\n'+reply_train_msg_str)
+            reply_train_msg_str = ""
+          }
+          reply_train_msg_str += (sorted_reply_train_msg_list[index]+"\n")
+          sent_classes_count+=1
+        }
+        if(reply_train_msg_str){
+          var len_reply_train_msg_str = reply_train_msg_str.length
+          reply_train_msg_str = head_str+'\n'+reply_train_msg_str.slice(0, len_reply_train_msg_str-1)
+          // log.TWR_INFO("\n"+reply_train_msg_str)
+          send_msg(received_uid, reply_train_msg_str)
+        }
+        ret = 0
       }
+      
+      log.TWR_INFO(sent_classes_count+" class(es) were sent to the user."+log_msg_postfix)
+      if(received_msg.search("/")<0){
+        if(setUserConfigVal(getUserConfigRow(received_uid), user_config_item2column("last_valid_input"), received_msg) < 0){
+          log.TWR_ERR("setUserConfigVal() failed.", "main.echo")
+          return -1
+        }
+      }
+      if(this_user_config_list[user_config_item2column("show_only_next_20_classes")-1]){
+        msg = "顯示全部? /show_all"
+      }
+      else{
+        msg = "只顯示最多 20 班? /show_less"
+      }
+      send_msg(received_uid, msg)
     }
   }
   return ret
