@@ -3,6 +3,7 @@ var station_name2code = {}
 var car_class_dict = {}
 function doPost(e){
   try {
+    log.TWR_DEBUG("===========================================================")
     var ret = 0
     var alert_received_msg = undefined
     var received_uid = undefined
@@ -28,23 +29,21 @@ function doPost(e){
     if(isEmpty(schedule_json_list)){
       schedule_json_list = get_json_list()
     }
-    if(initial(station_name2code, car_class_dict) < 0){
+    if(initial(station_name2code, car_class_dict, received_uid) < 0){
       log.TWR_ERR("initial() failed.", "main.main")
-      release()
+      release(received_uid, alert_received_msg)
       return -1
     }
-    log.TWR_DEBUG("===========================================================")
     if(echo(update, today_date, station_name2code, schedule_json_list, car_class_dict) < 0){
       log.TWR_ERR("echo() failed.", "main.main")
-      release()
+      release(received_uid, alert_received_msg)
       return -1
     }
-    if(received_uid && alert_received_msg){
-      delete_msg(received_uid, alert_received_msg)
-    }
+    release(received_uid, alert_received_msg)
   }
   catch (err){
     log.TWR_ERR(err, "doPost");
+    release(received_uid, alert_received_msg)
     crash_notification(err)
   }
 }
@@ -351,7 +350,7 @@ function Tai2Tai(str_t){
   }
 }
 
-function setup_station_code_dict(table){
+function setup_station_code_dict(table, received_uid){
   if(typeof table != "object"){
     log.TWE_RR("Wrong input type.", "main.setup_station_code_dict")
     return -1
@@ -362,7 +361,10 @@ function setup_station_code_dict(table){
   if(!response){
     var msg = "政府網站目前不可用： "+stations_code_url
     log.TWR_DEBUG(msg, "main.setup_station_code_dict")
-    send_msg(Author_UID, msg)
+    send_msg(received_uid, msg)
+    if(received_uid != Author_UID){
+        send_msg(Author_UID, msg)
+    }
     return -1
   }
   var html = response.getContentText()
@@ -404,7 +406,7 @@ function setup_station_code_dict(table){
   return 0
 }
     
-function initial(table_name2code, car_class_dict){
+function initial(table_name2code, car_class_dict, received_uid){
   if(typeof table_name2code != "object"){
     log.TWR_ERR("Wrong table_name2code type.", "main.initial")
     return -1
@@ -414,7 +416,7 @@ function initial(table_name2code, car_class_dict){
     return -1
   }
   if(isEmpty(table_name2code)){
-    if(setup_station_code_dict(table_name2code) < 0){
+    if(setup_station_code_dict(table_name2code, received_uid) < 0){
       log.TWR_ERR("setup_station_code_dict() failed.", "main.initial")
       return -1
     }
@@ -493,8 +495,11 @@ function initial(table_name2code, car_class_dict){
   return 0
 }
 
-function release(){
+function release(received_uid, alert_received_msg){
   log.TWR_INFO("Release.", "main.release")
+  if(received_uid && alert_received_msg){
+      delete_msg(received_uid, alert_received_msg)
+  }
 }
 
 function debug(){
