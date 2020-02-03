@@ -1,3 +1,410 @@
+function broadcast_msg(msg, forward_admin){
+  if(forward_admin){
+    for(var i=0; i<Admins_UID.length; i++){
+      forward_msg(Admins_UID[i], forward_admin.from_chat, forward_admin.the_message_id)
+    }
+  }
+  else{
+    var SpreadSheet = SpreadsheetApp.openById(fans_info_spreadsheets_id);
+    var Sheet = SpreadSheet.getSheetByName("fans list");
+    var lastRow = Sheet.getLastRow();
+    var start_row = 2
+    for(start_row=2; start_row<=lastRow; start_row++){
+      this_uid = getSheetVal("fans list", start_row, _getItemColInFansList("uid"))
+      send_msg(this_uid, msg)
+    }
+  }
+  return 0
+}
+
+function broadcast_photo(file_id, forward_admin){
+  if(forward_admin){
+    for(var i=0; i<Admins_UID.length; i++){
+      forward_msg(Admins_UID[i], forward_admin.from_chat, forward_admin.the_message_id)
+    }
+  }
+  else{
+    var SpreadSheet = SpreadsheetApp.openById(fans_info_spreadsheets_id);
+    var Sheet = SpreadSheet.getSheetByName("fans list");
+    var lastRow = Sheet.getLastRow();
+    var start_row = 2
+    for(start_row=2; start_row<=lastRow; start_row++){
+      this_uid = getSheetVal("fans list", start_row, _getItemColInFansList("uid"))
+      send_photo(this_uid, file_id)
+    }
+  }
+  return 0
+}
+
+function broadcast_sticker(file_id, forward_admin){
+  if(forward_admin){
+    for(var i=0; i<Admins_UID.length; i++){
+      send_msg(Admins_UID[i], "來自 "+forward_admin.first_name+" 的貼圖")
+      forward_msg(Admins_UID[i], forward_admin.from_chat, forward_admin.the_message_id)
+    }
+  }
+  else{
+    var SpreadSheet = SpreadsheetApp.openById(fans_info_spreadsheets_id);
+    var Sheet = SpreadSheet.getSheetByName("fans list");
+    var lastRow = Sheet.getLastRow();
+    var start_row = 2
+    for(start_row=2; start_row<=lastRow; start_row++){
+      this_uid = getSheetVal("fans list", start_row, _getItemColInFansList("uid"))
+      send_sticker(this_uid, file_id)
+    }
+  }
+  return 0
+}
+
+function broadcast_voice(file_id, forward_admin){
+  if(forward_admin){
+    for(var i=0; i<Admins_UID.length; i++){
+      forward_msg(Admins_UID[i], forward_admin.from_chat, forward_admin.the_message_id)
+    }
+  }
+  else{
+    var SpreadSheet = SpreadsheetApp.openById(fans_info_spreadsheets_id);
+    var Sheet = SpreadSheet.getSheetByName("fans list");
+    var lastRow = Sheet.getLastRow();
+    var start_row = 2
+    for(start_row=2; start_row<=lastRow; start_row++){
+      this_uid = getSheetVal("fans list", start_row, _getItemColInFansList("uid"))
+      send_voice(this_uid, file_id)
+    }
+  }
+  return 0
+}
+
+function broadcast_video_note(file_id, forward_admin){
+  if(forward_admin){
+    for(var i=0; i<Admins_UID.length; i++){
+      forward_msg(Admins_UID[i], forward_admin.from_chat, forward_admin.the_message_id)
+    }
+  }
+  else{
+    var SpreadSheet = SpreadsheetApp.openById(fans_info_spreadsheets_id);
+    var Sheet = SpreadSheet.getSheetByName("fans list");
+    var lastRow = Sheet.getLastRow();
+    var start_row = 2
+    for(start_row=2; start_row<=lastRow; start_row++){
+      this_uid = getSheetVal("fans list", start_row, _getItemColInFansList("uid"))
+      send_video_note(this_uid, file_id)
+    }
+  }
+  return 0
+}
+
+function broadcast_document(file_id, forward_admin){
+  if(forward_admin){
+    for(var i=0; i<Admins_UID.length; i++){
+      forward_msg(Admins_UID[i], forward_admin.from_chat, forward_admin.the_message_id)
+    }
+  }
+  else{
+    var SpreadSheet = SpreadsheetApp.openById(fans_info_spreadsheets_id);
+    var Sheet = SpreadSheet.getSheetByName("fans list");
+    var lastRow = Sheet.getLastRow();
+    var start_row = 2
+    for(start_row=2; start_row<=lastRow; start_row++){
+      this_uid = getSheetVal("fans list", start_row, _getItemColInFansList("uid"))
+      send_document(this_uid, file_id)
+    }
+  }
+  return 0
+}
+
+function broadcast_poll(forward_fans, forward_admin){
+  //Forward poll message anyway
+  if(forward_admin){
+    for(var i=0; i<Admins_UID.length; i++){
+      forward_msg(Admins_UID[i], forward_admin.from_chat, forward_admin.the_message_id)
+    }
+  }
+  else{
+    var SpreadSheet = SpreadsheetApp.openById(fans_info_spreadsheets_id);
+    var Sheet = SpreadSheet.getSheetByName("fans list");
+    var lastRow = Sheet.getLastRow();
+    var start_row = 2
+    for(start_row=2; start_row<=lastRow; start_row++){
+      this_uid = getSheetVal("fans list", start_row, _getItemColInFansList("uid"))
+      forward_msg(this_uid, forward_fans.from_chat, forward_fans.the_message_id)
+    }
+  }
+  return 0
+}
+
+function send_keyboard(uid, msg, keyboard_t){
+  var keyboard_json = {
+    keyboard: keyboard_t,
+    resize_keyboard: true,
+    one_time_keyboard: false
+  }
+  var payload = {
+    method: "sendMessage",
+    chat_id: String(uid),
+    text: msg,
+    reply_markup: JSON.stringify(keyboard_json)
+  }
+  var data = {
+    method: "post",
+    payload: payload
+  }
+  var res = retryFetch("https://api.telegram.org/bot"+tg_token+"/", data);
+  if(!res){
+    log.ERR("retryFetch() failed", "tools.send_keyboard")
+    return undefined
+  }
+  return res
+}
+
+function send_msg(uid, msg){
+  var payload = {
+    method: "sendMessage",
+    chat_id: String(uid),
+    text: msg
+  }
+  var data = {
+    method: "post",
+    payload: payload
+  }
+  var res = retryFetch("https://api.telegram.org/bot"+tg_token+"/", data);
+  if(!res){
+    log.ERR("retryFetch() failed", "tools.send_msg")
+    return undefined
+  }
+  return (JSON.parse(res)).result
+}
+
+function send_photo(uid, file_id){
+  var payload = {
+    method: "sendPhoto",
+    chat_id: String(uid),
+    photo: file_id
+  }
+  var data = {
+    method: "post",
+    payload: payload
+  }
+  var res = retryFetch("https://api.telegram.org/bot"+tg_token+"/", data);
+  if(!res){
+    log.ERR("retryFetch() failed", "tools.send_photo")
+    return undefined
+  }
+  return (JSON.parse(res)).result
+}
+
+function send_sticker(uid, file_id){
+  var payload = {
+    method: "sendSticker",
+    chat_id: String(uid),
+    sticker: file_id
+  }
+  var data = {
+    method: "post",
+    payload: payload
+  }
+  var res = retryFetch("https://api.telegram.org/bot"+tg_token+"/", data);
+  if(!res){
+    log.ERR("retryFetch() failed", "tools.send_sticker")
+    return undefined
+  }
+  return (JSON.parse(res)).result
+}
+
+function send_voice(uid, file_id){
+  var payload = {
+    method: "sendVoice",
+    chat_id: String(uid),
+    voice: file_id
+  }
+  var data = {
+    method: "post",
+    payload: payload
+  }
+  var res = retryFetch("https://api.telegram.org/bot"+tg_token+"/", data);
+  if(!res){
+    log.ERR("retryFetch() failed", "tools.send_voice")
+    return undefined
+  }
+  return (JSON.parse(res)).result
+}
+
+function send_video_note(uid, file_id){
+  var payload = {
+    method: "sendVideoNote",
+    chat_id: String(uid),
+    video_note: file_id
+  }
+  var data = {
+    method: "post",
+    payload: payload
+  }
+  var res = retryFetch("https://api.telegram.org/bot"+tg_token+"/", data);
+  if(!res){
+    log.ERR("retryFetch() failed", "tools.send_video_note")
+    return undefined
+  }
+  return (JSON.parse(res)).result
+}
+
+function send_document(uid, file_id){
+  var payload = {
+    method: "sendDocument",
+    chat_id: String(uid),
+    document: file_id
+  }
+  var data = {
+    method: "post",
+    payload: payload
+  }
+  var res = retryFetch("https://api.telegram.org/bot"+tg_token+"/", data);
+  if(!res){
+    log.ERR("retryFetch() failed", "tools.send_document")
+    return undefined
+  }
+  return (JSON.parse(res)).result
+}
+
+function send_poll(uid, poll){
+  var options_list = []
+  for(var i=0;i<poll.options.length;i++){
+    options_list.push(poll.options[i].text)
+  }
+  var payload = {
+    method: "sendPoll",
+    chat_id: String(uid),
+    question: poll.question,
+    options: JSON.stringify(options_list),
+    is_anonymous: poll.is_anonymous,
+    type: poll.type,
+    allows_multiple_answers: poll.allows_multiple_answers,
+    correct_option_id: poll.correct_option_id,
+    is_closed: poll.is_closed
+  }
+  var data = {
+    method: "post",
+    payload: payload
+  }
+  var res = retryFetch("https://api.telegram.org/bot"+tg_token+"/", data);
+  if(!res){
+    log.ERR("retryFetch() failed", "tools.send_poll")
+    return undefined
+  }
+  return (JSON.parse(res)).result
+}
+
+function forward_msg(target_chat, from_chat, the_message_id){
+  var payload = {
+    method: "forwardMessage",
+    chat_id: String(target_chat),
+    from_chat_id: String(from_chat),
+    message_id: the_message_id
+  }
+  var data = {
+    method: "post",
+    payload: payload
+  }
+  var res = retryFetch("https://api.telegram.org/bot"+tg_token+"/", data);
+  if(!res){
+    log.ERR("retryFetch() failed", "tools.forward_msg")
+    return undefined
+  }
+  return (JSON.parse(res)).result
+}
+
+function send_fans_number(uid){
+  var SpreadSheet = SpreadsheetApp.openById(fans_info_spreadsheets_id);
+  var Sheet = SpreadSheet.getSheetByName("fans list");
+  var lastRow = Sheet.getLastRow();
+  var keyboard = undefined
+  if(Admins_UID.indexOf(uid) < 0){
+    keyboard = keyboard_home
+  }
+  else{
+    keyboard = keyboard_panel
+  }
+  send_keyboard(uid, "粉絲人數: "+String(lastRow-1), keyboard)
+}
+
+function delete_msg(uid, message){
+  var sent_message_dict = JSON.parse(message.getContentText())
+  var payload = {
+    method: "deleteMessage",
+    chat_id: String(uid),
+    message_id: sent_message_dict.result.message_id,
+    parse_mode: "HTML"
+  }
+  var data = {
+    method: "post",
+    payload: payload
+  }
+  var res = retryFetch("https://api.telegram.org/bot" + tg_token + "/", data);
+  if(!res){
+    log.ERR("retryFetch() failed", "tools.delete_msg")
+    return undefined
+  }
+  return res
+}
+
+function fan_row(uid){
+  var SpreadSheet = SpreadsheetApp.openById(fans_info_spreadsheets_id);
+  var Sheet = SpreadSheet.getSheetByName("fans list");
+  var lastRow = Sheet.getLastRow();
+  var start_row = 2
+  for(start_row=2; start_row<=lastRow; start_row++){
+    this_uid = getSheetVal("fans list", start_row, _getItemColInFansList("uid"))
+    if(this_uid == String(uid)){
+      return start_row
+    }
+  }
+  return undefined
+}
+
+function join(uid, row_t){
+  var row = undefined
+  if(row_t){
+    row = row_t
+  }
+  else{
+    row = fan_row(uid)
+  }
+  if(row){
+    return 0
+  }
+  var SpreadSheet = SpreadsheetApp.openById(fans_info_spreadsheets_id);
+  var Sheet = SpreadSheet.getSheetByName("fans list");
+  var lastRow = Sheet.getLastRow();
+  setSheetVal("fans list", lastRow+1, _getItemColInFansList("uid"), String(uid))
+  send_msg(uid, "開啟追隨")
+  return 0
+}
+
+function leave(uid, row_t){
+  var row = undefined
+  if(row_t){
+    row = row_t
+  }
+  else{
+    row = fan_row(uid)
+  }
+  if(row){
+    var SpreadSheet = SpreadsheetApp.openById(fans_info_spreadsheets_id);
+    var Sheet = SpreadSheet.getSheetByName("fans list");
+    Sheet.deleteRow(row)
+    send_msg(uid, "取消追隨")
+  }
+  return 0
+}
+
+function _getItemColInFansList(item){
+  if(item == "uid"){
+    return 1
+  }
+  var msg = "[error] Wrong column: "+item
+  log.ERR(msg, "tools._getItemColInFansList")
+  return -1
+}
+
 function get_timestamp(dayoffset){
   var datetime = new Date();
   if(dayoffset){
@@ -13,26 +420,6 @@ function get_timestamp(dayoffset){
   return timestamp;
 }
 
-function get_date_num_str(dayoffset){
-  var datetime = new Date();
-  if(dayoffset){
-    datetime.setDate(datetime.getDate() + dayoffset);
-  }
-  var year = datetime.getFullYear();
-  var month = datetime.getMonth()+1;
-  month = String(month)
-  if(month.length == 1){
-    month = '0'+month
-  }
-  var date = datetime.getDate();
-  date = String(date)
-  if(date.length == 1){
-    date = '0'+date
-  }
-  var datestamp = String(year)+String(month)+String(date);
-  return datestamp;
-}
-
 function sleep(milliseconds) 
 { 
   var start = new Date().getTime(); 
@@ -42,7 +429,7 @@ function sleep(milliseconds)
 }
 
 function retryFetch(url, option, retry_times){
-  var max_times = 3
+  var max_times = 1
   var response = undefined
   if(retry_times){
     max_times = retry_times
@@ -51,256 +438,52 @@ function retryFetch(url, option, retry_times){
   while(count < max_times){
     try{
       if(option){
-        response = UrlFetchApp.fetch(url, option);
+        response = UrlFetchApp.fetch(url, option)
       }
       else{
-        response = UrlFetchApp.fetch(url);
+        response = UrlFetchApp.fetch(url)
       }
       return response
     }
     catch (err){
       count++;
-      sleep(1000)
+      sleep(500)
     }
   }
-  log.TWR_ERR("網頁不可用: "+url, "tools.retryFetch")
+  log.ERR("網頁不可用, url: "+url+", option: "+JSON.stringify(option), "tools.retryFetch")
   return undefined;
 }
 
-function record_user(update){
-  var SpreadSheet = SpreadsheetApp.openById(user_info_spreadsheets_id);
-  var Sheet = SpreadSheet.getSheetByName(user_using_record_sheet_name);
-  var LastRow = Sheet.getLastRow();
-  var received_uid = update.message.chat.id;
-  var received_username = update.message.chat.username;
-  if(!received_username){
-    received_username = ""
-  }
-  var received_first_name = update.message.chat.first_name;
-  var received_last_name = update.message.chat.last_name;
-  if(!received_last_name){
-    received_last_name = ""
-  }
-  //寫入資料
-  Sheet.appendRow([received_uid, received_username, received_first_name, received_last_name, get_timestamp()]);
-  //回傳處理完成
-  return ContentService.createTextOutput(true);
+function getSheetVal(sheetName, row, col){
+  var SpreadSheet = SpreadsheetApp.openById(fans_info_spreadsheets_id);
+  var Sheet = SpreadSheet.getSheetByName(sheetName);
+  return Sheet.getSheetValues(row, col, 1, 1)[0][0]
 }
 
-function send_msg(uid, msg){
-  var payload = {
-    "method": "sendMessage",
-    "chat_id": String(uid),
-    "text": msg
-  }
-  var data = {
-    "method": "post",
-    "payload": payload
-  }
-  var res = retryFetch("https://api.telegram.org/bot"+tg_token+"/", data);
-  if(!res){
-    log.TWR_ERR("retryFetch() failed", "tools.send_msg")
-    return {}
-  }
-  return res
-}
-
-function delete_msg(uid, message){
-  var sent_message_dict = JSON.parse(message.getContentText())
-  var response = UrlFetchApp.fetch("https://api.telegram.org/bot" + tg_token + "/deleteMessage?message_id=" + sent_message_dict.result.message_id + "&chat_id=" + uid + "&parse_mode=HTML");
-  return response
-}
-
-function downloadFile2GD(fileName, fileURL, folderId) {
-  //Reference from https://stackoverflow.com/questions/55384021/download-file-to-google-drive-folder-using-app-script
-  
-  var response = UrlFetchApp.fetch(fileURL);
-  var fileBlob = response.getBlob()
-  var fileString = fileBlob.getDataAsString()
-  var folder = DriveApp.getFolderById(folderId);
-  // var result = folder.createFile(fileBlob);
-  var result = folder.createFile(fileName, fileString);
-}
-
-function isFileExists(filename, folderId){
-  //Supplied version Mr Rebot -  testing
-  var filefound=false;
-  var folder = DriveApp.getFolderById(folderId);
-
-  //Folder does not exist
-  if(!folder){
-    // log.TWR_DEBUG("No Folder Found");
-  }
-  //Folder does exist
-  else{
-    // log.TWR_DEBUG("Folder Found")
-    var file = folder.getFilesByName(filename);
-    if(!file.hasNext()){
-      // log.TWR_DEBUG("No File Found");
-    }
-    else{
-       // log.TWR_DEBUG("File Found");
-       filefound=true;
-    }
-  }
-  // log.TWR_DEBUG(filefound);
-  return filefound;
-}
-
-function crash_notification(err_msg){
-  if(!USE_NOTIFY_BOT){
-    return 0
-  }
-  msg = "[TWR crash] "+PROGRAM_NAME+" crashed. err: "+err_msg
-  log.TWR_ERR(msg, "tools.crash_notification")
-  send_msg(Author_UID, msg)
-  return 0
-}
-
-function createFileInMyFolder(exportFileName, content, folderid) {
-  var folder = DriveApp.getFolderById(folderid);
-  folder.createFile(exportFileName, content);
-}
-
-function delteFile(fileName, folderId) {
-  files = DriveApp.getFilesByName(fileName)
-  if(files.hasNext()){
-    file = files.next()
-    DriveApp.getFolderById(folderId).removeFile(file)
-  }
-}
-
-function unZipIt(zipfilename, exportFileName, folderid) {
-  var theFolder = DriveApp.getFolderById(folderid);
-  var theFile = theFolder.getFilesByName(zipfilename);
-  var fileBlob = theFile.next().getBlob();
-  fileBlob.setContentType("application/zip");
-  var unZippedfile = Utilities.unzip(fileBlob);
-//  var newDriveFile = DriveApp.createFile(unZippedfile[0]);
-  createFileInMyFolder(exportFileName, unZippedfile[0].getDataAsString(), folderid)
-  
-}
-
-function check_and_download_json(){
-  var today_json_name = get_date_num_str()+".json"
-  var yesterday_json_name = get_date_num_str(-1)+".json"
-  var tomorrow_json_name = get_date_num_str(1)+".json"
-  
-  if(!isFileExists(today_json_name, my_folder_id)){
-    schedule_json_list = []
-    log.TWR_INFO("JSON file today was not found. Start to download "+ today_json_name)
-    file_url = get_json_file_url(today_json_name)
-    if(isEmpty(file_url)){
-      log.TWR_ERR("get_json_file_url() filed 1", "tools.check_and_download_json")
-      return -1
-    }
-    downloadFile2GD(today_json_name, file_url, my_folder_id)
-  }
-  else if(!isFileExists(tomorrow_json_name, my_folder_id)){
-    log.TWR_INFO("JSON file tomorrow was not found. Start to download "+tomorrow_json_name)
-    file_url = get_json_file_url(tomorrow_json_name)
-    if(isEmpty(file_url)){
-      log.TWR_ERR("get_json_file_url() failed 2", "tools.check_and_download_json")
-      return -2
-    }
-    downloadFile2GD(tomorrow_json_name, file_url, my_folder_id)
-  }
-  else{
-    return 0
-  }
-  delteFile(yesterday_json_name, my_folder_id)
-  return 0
-}
-
-function str2int(str_t){
-  var len_str_t = str_t.length
-  while(len_str_t > 1){
-    if(str_t[0] == '0'){
-      str_t = str_t.slice(1, len_str_t)
-      len_str_t = str_t.length
-      continue
-    }
-    break
-  }
-  return parseInt(str_t)
-}
-
-function user_config_item2column(item){
-  var col = undefined
-  var len_user_config_items_list = user_config_items_list.length
-  for(var col=0; col<len_user_config_items_list; col++){
-    if(user_config_items_list[col]==item){
-      return col+1
-    }
-  }
-}
-
-function getUserConfigList(uid){
-  var SpreadSheet = SpreadsheetApp.openById(user_info_spreadsheets_id);
-  var Sheet = SpreadSheet.getSheetByName(user_config_sheet_name);
-  var len_user_config_items_list = user_config_items_list.length
-  var start_row = 1
-  var obj_t = Sheet.getSheetValues(start_row, 1, 1, len_user_config_items_list)
-  while(obj_t[0][0] != ""){
-    if(obj_t[0][0] == uid){
-      // log.TWR_DEBUG(obj_t[0])
-      return obj_t[0]
-    }
-    start_row++
-    obj_t = Sheet.getSheetValues(start_row, 1, 1, len_user_config_items_list)
-  }
-  return undefined
-}
-
-function getUserConfigRow(uid){
-  var SpreadSheet = SpreadsheetApp.openById(user_info_spreadsheets_id);
-  var Sheet = SpreadSheet.getSheetByName(user_config_sheet_name);
-  var len_user_config_items_list = user_config_items_list.length
-  var start_row = 1
-  var obj_t = Sheet.getSheetValues(start_row, 1, 1, len_user_config_items_list)
-  while(obj_t[0][0] != ""){
-    if(obj_t[0][0] == uid){
-      // log.TWR_DEBUG(obj_t[0])
-      return start_row
-    }
-    start_row++
-    obj_t = Sheet.getSheetValues(start_row, 1, 1, len_user_config_items_list)
-  }
-  return -1
-}
-
-function setUserConfigVal(row, col, val){
-  var SpreadSheet = SpreadsheetApp.openById(user_info_spreadsheets_id);
-  var Sheet = SpreadSheet.getSheetByName(user_config_sheet_name);
+function setSheetVal(sheetName, row, col, val){
+  var SpreadSheet = SpreadsheetApp.openById(fans_info_spreadsheets_id);
+  var Sheet = SpreadSheet.getSheetByName(sheetName);
   Sheet.getRange(row, col).setValue(val)
   return 0
 }
 
-function max_split_spaces(text){
-  var num = 1
-  var space = ' '
-  var pre_space = ' '
-  while(text.search(space) >= 0){
-    pre_space = space
-    num++
-    space += ' '
+function crash_notification(err_msg){
+  msg = "[crash] "+PROGRAM_NAME+" crashed. err: "+err_msg
+  log.ERR(msg, "tools.crash_notification")
+  for(var i=0; i<Admins_UID.length; i++){
+    send_msg(Admins_UID[i], msg)
   }
-  return pre_space
+  return 0
 }
 
 function setWebhook(){
   var botToken = tg_token
-  var appUrl = "https://script.google.com/macros/s/AKfycbwPBt0WAwMKY9K8T0-4DS_x2IYHnWGsZ6n8lq_XzkxEvkPFO7Ui/exec"
-  response = UrlFetchApp.fetch("https://api.telegram.org/bot"+botToken+"/setWebhook?url="+appUrl)
-  log.TWR_DEBUG(response)
+  response = UrlFetchApp.fetch("https://api.telegram.org/bot"+botToken+"/setWebhook?url="+this_gas_exec_url)
+  log.DEBUG(response)
 }
 
 function deleteWebhook(){
   var botToken = tg_token
   response = UrlFetchApp.fetch("https://api.telegram.org/bot"+botToken+"/setWebhook?url=")
-  log.TWR_DEBUG(response)
-}
-
-function isEmpty(obj) {
-  return Object.keys(obj).length === 0;
+  log.DEBUG(response)
 }
