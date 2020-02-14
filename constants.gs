@@ -1,4 +1,3 @@
-var telegramUrl = "https://api.telegram.org/bot" + tg_token
 var user_config_items_list = ["uid", "last_valid_input", "show_only_next_20_classes"]
 
 var PROGRAM_NAME = "Taiwan Railway bot"
