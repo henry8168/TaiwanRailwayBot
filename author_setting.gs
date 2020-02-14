@@ -1,5 +1,5 @@
 var DEBUG_MODE = 1
-var VERSION = "1.2.7"
+var VERSION = "1.2.8"
 var USE_NOTIFY_BOT = true
 
 var Author_UID = YourUID
