@@ -346,6 +346,14 @@ function delete_msg(uid, message){
   return res
 }
 
+function donation(uid){
+  send_photo(uid, tw_pay_donation_url, "Taiwan Pay")
+  send_photo(uid, line_pay_donation_url, "Line Pay")
+  send_msg(uid, "目前提供 Taiwan Pay 和 Line Pay 兩種抖內管道，不限金額。謝謝乾爹乾媽。")
+  send_msg(Author_UID, "有人點擊了抖內指令, UID: "+String(uid))
+  return 0
+}
+
 function fan_row(uid){
   var SpreadSheet = SpreadsheetApp.openById(fans_info_spreadsheets_id);
   var Sheet = SpreadSheet.getSheetByName("fans list");

@@ -7,13 +7,33 @@ function doPost(e){
     var ret = 0
     var alert_received_msg = undefined
     var received_uid = undefined
+    var received_username = undefined
+    var received_firstname = undefined
+    var received_msg = undefined
     var update = JSON.parse(e.postData.contents);
     if(update.message){
-      var received_msg = update.message.text
+      if(update.message.chat){
+        received_uid = update.message.chat.id
+        received_username = update.message.chat.username
+        received_firstname = update.message.chat.first_name
+      }
+      received_msg = update.message.text
       if(received_msg && update.message.chat){
         received_uid = update.message.chat.id
         alert_received_msg = send_msg(received_uid, "收到訊息，開始處理...")
       }
+    }
+    if(received_msg && (received_msg.indexOf("/help") == 0 || received_msg.indexOf("/start") == 0)){
+      var log_msg_postfix = ", UID: "+received_uid+", username: "+received_username+", First name: "+received_firstname
+      log.TWR_INFO(received_msg + log_msg_postfix, "main.doPost")
+      send_msg(received_uid, help_msg)
+      release(received_uid, alert_received_msg)
+      return 0
+    }
+    else if(received_msg && received_msg.indexOf("/donation") == 0){
+      donation(received_uid)
+      release(received_uid, alert_received_msg)
+      return 0
     }
     ret = check_and_download_json()
     if(ret < 0){
@@ -96,9 +116,9 @@ function echo(update, today_date, table_name2code, json_list_t, car_class_dict){
       ContentService.createTextOutput(true);
     }
     // show all or show less
-    if(received_msg.search("/show_less") == 0 || received_msg.search("/show_all") == 0){
+    if(received_msg.indexOf("/show_less") == 0 || received_msg.indexOf("/show_all") == 0){
       user_config_row = getUserConfigRow(received_uid)
-      setUserConfigVal(user_config_row, user_config_item2column("show_only_next_20_classes"), received_msg.search("/show_less")==0)
+      setUserConfigVal(user_config_row, user_config_item2column("show_only_next_20_classes"), received_msg.indexOf("/show_less")==0)
       this_user_config_list = getUserConfigList(received_uid)
       var last_valid_input = this_user_config_list[user_config_item2column("last_valid_input")-1]
       input_stations = last_valid_input.split(max_split_spaces(last_valid_input))
@@ -180,7 +200,7 @@ function echo(update, today_date, table_name2code, json_list_t, car_class_dict){
           return -1
         }
       }
-      var sorted_reply_train_msg_list = reply_train_msg_list_to_dict(reply_train_msg_list, will_show_only_next_20_classes)
+      var sorted_reply_train_msg_list = reply_train_msg_list_to_dict(reply_train_msg_list,will_show_only_next_20_classes)
       var sent_classes_count = 0
       if(isEmpty(sorted_reply_train_msg_list)){
         msg = "查無班次"
@@ -221,7 +241,7 @@ function echo(update, today_date, table_name2code, json_list_t, car_class_dict){
       }
       
       log.TWR_INFO(sent_classes_count+" class(es) were sent to the user."+log_msg_postfix)
-      if(received_msg.search("/")<0){
+      if(received_msg.indexOf("/")<0){
         if(setUserConfigVal(getUserConfigRow(received_uid), user_config_item2column("last_valid_input"), received_msg) < 0){
           log.TWR_ERR("setUserConfigVal() failed.", "main.echo")
           return -1
@@ -248,7 +268,7 @@ function reply_train_msg_list_to_dict(msg_list, is_show_less){
     var line_list = msg_list[index].split(' ')
     var len_line_list = line_list.length
     for(var i=0; i<len_line_list; i++){
-      if(line_list[i].search(':') >= 0){
+      if(line_list[i].indexOf(':') >= 0){
         key = str2int(line_list[i].replace(':', ''))
         msg_dict[key] = msg_list[index]
         break
@@ -282,7 +302,7 @@ function reply_train_msg_list_to_dict(msg_list, is_show_less){
 
 function get_json_file_url(file_name){
     var taiwan_railway_administration_url = "https://ods.railway.gov.tw"
-    var json_list_url = taiwan_railway_administration_url + "/tra-ods-web/ods/download/dataResource/railway_schedule/JSON/list"
+    var json_list_url = taiwan_railway_administration_url + "/tra-ods-web/ods/download/dataResource/railway_schedule/JSON/list";
     var response = retryFetch(json_list_url)
     if(!response){
       msg = "Access failed. url: "+json_list_url
@@ -295,7 +315,7 @@ function get_json_file_url(file_name){
     var target_line = ""
     var len_html_list = html_list.length
     for(var index=0; index<len_html_list; index++){
-        if(html_list[index].search(file_name) >= 0){
+        if(html_list[index].indexOf(file_name) >= 0){
             target_line = html_list[index]
             break
         }
@@ -304,9 +324,9 @@ function get_json_file_url(file_name){
         log.TWR_ERR("No such file name.")
         return ""
     }
-    var left_quotation_mark_index = target_line.search('\"')
+    var left_quotation_mark_index = target_line.indexOf('\"')
     var len_target_line = target_line.length
-    var right_quotation_mark_index = (target_line.slice(left_quotation_mark_index+1, len_target_line)).search('\"')
+    var right_quotation_mark_index = (target_line.slice(left_quotation_mark_index+1, len_target_line)).indexOf('\"')
     right_quotation_mark_index += left_quotation_mark_index+1
     return taiwan_railway_administration_url + target_line.slice(left_quotation_mark_index+1, right_quotation_mark_index)
 }
@@ -335,10 +355,10 @@ function get_json_list(){
 }
 
 function Tai2Tai(str_t){
-  if(str_t.search("臺") >= 0){
+  if(str_t.indexOf("臺") >= 0){
     return str_t.replace("臺", "台")
   }
-  if(str_t.search("台") >= 0){
+  if(str_t.indexOf("台") >= 0){
     return str_t.replace("台", "臺")
   }
 }
@@ -356,7 +376,7 @@ function setup_station_code_dict(table, received_uid){
     log.TWR_DEBUG(msg, "main.setup_station_code_dict")
     send_msg(received_uid, msg)
     if(received_uid != Author_UID){
-        send_msg(Author_UID, msg)
+      send_msg(Author_UID, msg)
     }
     return -1
   }
@@ -365,7 +385,7 @@ function setup_station_code_dict(table, received_uid){
   var train_code_html_list = []
   var len_html_list = html_list.length
   for(var index=0; index<len_html_list; index++){
-    if(html_list[index].search("traincode_name") >= 0 || html_list[index].search("traincode_code") >= 0){
+    if(html_list[index].indexOf("traincode_name") >= 0 || html_list[index].indexOf("traincode_code") >= 0){
       train_code_html_list.push(html_list[index])
     }
   }
@@ -384,12 +404,12 @@ function setup_station_code_dict(table, received_uid){
   var left_code_string = "<div class=\"traincode_code1\">"
   var left_code_string_len = left_code_string.length
   for(var index=0; index < len_train_code_html_list; index+=2){
-    left_name_index = train_code_html_list[index].search(left_name_string)
-    right_index = train_code_html_list[index].search(right_dive_str)
+    left_name_index = train_code_html_list[index].indexOf(left_name_string)
+    right_index = train_code_html_list[index].indexOf(right_dive_str)
     key_str = train_code_html_list[index].slice(left_name_index+left_name_string_len, right_index)
     
-    left_code_index = train_code_html_list[index+1].search(left_code_string)
-    right_index = train_code_html_list[index+1].search(right_dive_str)
+    left_code_index = train_code_html_list[index+1].indexOf(left_code_string)
+    right_index = train_code_html_list[index+1].indexOf(right_dive_str)
     code_str = train_code_html_list[index+1].slice(left_code_index+left_code_string_len, right_index)
     if(!(key_str in table)){
       table[key_str] = code_str
@@ -491,7 +511,7 @@ function initial(table_name2code, car_class_dict, received_uid){
 function release(received_uid, alert_received_msg){
   log.TWR_INFO("Release.", "main.release")
   if(received_uid && alert_received_msg){
-      delete_msg(received_uid, alert_received_msg)
+    delete_msg(received_uid, alert_received_msg)
   }
 }
 
