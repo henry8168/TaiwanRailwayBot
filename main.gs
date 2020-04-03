@@ -30,7 +30,7 @@ function doPost(e){
       release(received_uid, alert_received_msg)
       return 0
     }
-    else if(received_msg && received_msg.indexOf("/donation") == 0){
+    else if(received_uid >=0 && received_msg && received_msg.indexOf("/donation") == 0){
       donation(received_uid)
       release(received_uid, alert_received_msg)
       return 0
@@ -129,6 +129,19 @@ function echo(update, today_date, table_name2code, json_list_t, car_class_dict){
     
     // Reply to the message
     len_input_stations = input_stations.length
+    if(len_input_stations == 1 && input_stations[0].length >= MIN_2STATIONS_NAME_LEN && input_stations[0].length <= MAX_2STATIONS_NAME_LEN){
+      var input_text = input_stations[0]
+      var len_input_text = input_text.length
+      var i = 2
+      for(i = 2; i<len_input_text-1;i+=1){
+          if((input_text.slice(0,i) in table_name2code) && input_text.slice(i,len_input_text) in table_name2code){
+            input_stations.push(input_text.slice(i, len_input_text))
+            input_stations[0] = input_text.slice(0, i)
+            len_input_stations = input_stations.length
+            break;
+          }
+      }
+    }
     if(len_input_stations > 2 || len_input_stations < 2){
       msg = "車站數不正確，請輸入兩個車站名。訊息: "+received_msg
       send_msg(received_uid, msg)

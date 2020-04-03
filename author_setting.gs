@@ -1,5 +1,5 @@
 var DEBUG_MODE = 1
-var VERSION = "1.3.0"
+var VERSION = "1.4.0"
 var USE_NOTIFY_BOT = true
 
 var Author_UID = "YourUID"
@@ -17,7 +17,8 @@ var line_pay_donation_url = "" //Your Line Pay QRCode URL
 
 var help_msg = "[台鐵時刻查詢] ver "+VERSION+" \n\
 請輸入兩車站名，將告知火車班次。\n\
-ex: 桃園 台北\n\
+ex1: 桃園 台北\n\
+ex2: 桃園台北\n\
 \n\
 資料來源: https://data.gov.tw/dataset/6138\n\
 開發者: @HenryLab\n"
