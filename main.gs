@@ -3,7 +3,7 @@ var station_name2code = {}
 var car_class_dict = {}
 function doPost(e){
   try {
-    log.TWR_DEBUG("===========================================================")
+    log.TWR_DEBUG("-----------------------------------------------------------")
     var ret = 0
     var alert_received_msg = undefined
     var received_uid = undefined
