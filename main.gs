@@ -59,7 +59,8 @@ function doPost(e){
       release(received_uid, alert_received_msg)
       return -1
     }
-    release(received_uid, alert_received_msg)
+    release(received_uid, alert_received_msg);
+    return 200
   }
   catch (err){
     log.TWR_ERR(err, "doPost");
