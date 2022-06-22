@@ -335,7 +335,7 @@ function get_json_file_url(file_name){
         }
     }
     if(target_line==""){
-        log.TWR_ERR("No such file name.")
+        log.TWR_ERR("No such file name: " + file_name + ", json_list_url: " + json_list_url)
         return ""
     }
     var left_quotation_mark_index = target_line.indexOf('\"')
