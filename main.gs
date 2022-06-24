@@ -505,6 +505,10 @@ function initial(table_name2code, car_class_dict, received_uid){
                               "KEY_CAR_CLASS_NAME_EN": "Ordinary train",
                               "KEY_CAR_CLASS_DESCRIPTION": ""
                              }
+    car_class_dict["110G"] = {"KEY_CAR_CLASS_NAME_ZH_TW": "自強3000",
+                              "KEY_CAR_CLASS_NAME_EN": "Tze-Chiang EMU3000",
+                              "KEY_CAR_CLASS_DESCRIPTION": "城際型電聯車"
+                             }
     
     // 加開班次
     var post_digit_list = ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F']
