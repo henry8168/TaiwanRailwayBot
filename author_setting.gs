@@ -5,8 +5,9 @@ var USE_NOTIFY_BOT = true
 var Author_UID = "YourUID"
 var tg_token = "YourBotToken"
 
-var my_folder_id = 'YourGoogleDriveFolderIdToSaveScheduleJson'
-var my_folder_name = 'schedule_json'
+var my_folder_id = "YourRootFolderOfProject"
+var my_schedule_folder_id = 'YourGoogleDriveFolderIdToSaveScheduleJson'
+var my_schedule_folder_name = 'schedule_json'
 
 var user_info_spreadsheets_id = "YourGoogleDriveSpreadSheetsIdToRecordUser"
 var user_using_record_sheet_name = "user using record"
