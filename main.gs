@@ -1,3 +1,7 @@
+/*
+每次部屬完成記得 setWebhook 到新的 URL
+*/
+
 var schedule_json_list = []
 var station_name2code = {}
 var car_class_dict = {}
@@ -35,6 +39,7 @@ function doPost(e){
       release(received_uid, alert_received_msg)
       return 0
     }
+    /*
     ret = check_and_download_json()
     if(ret < 0){
       msg = "台鐵網頁失效"
@@ -45,6 +50,7 @@ function doPost(e){
       }
       crash_notification(msg)
     }
+    */
     var today_date = get_date_num_str()
     if(isEmpty(schedule_json_list)){
       schedule_json_list = get_json_list()
@@ -59,7 +65,7 @@ function doPost(e){
       release(received_uid, alert_received_msg)
       return -1
     }
-    release(received_uid, alert_received_msg);
+    release(received_uid, alert_received_msg)
     return 200
   }
   catch (err){
@@ -351,7 +357,7 @@ function get_json_list(){
   tomorrow_file_name = get_date_num_str(1)+".json"
   yesturday_file_name = get_date_num_str(-1)+".json"
   
-  var folder = DriveApp.getFolderById(my_folder_id);
+  var folder = DriveApp.getFolderById(my_schedule_folder_id);
   var files = folder.getFiles();
   var file = undefined
   var file_t = undefined
@@ -379,10 +385,12 @@ function Tai2Tai(str_t){
 
 function setup_station_code_dict(table, received_uid){
   if(typeof table != "object"){
-    log.TWE_RR("Wrong input type.", "main.setup_station_code_dict")
+    log.TWR_ERR("Wrong input type.", "main.setup_station_code_dict")
     return -1
   }
-    
+
+  /*
+  // Access from GOV web
   var stations_code_url = "https://tip.railway.gov.tw/tra-tip-web/tip/tip001/tip111/view"
   var response = retryFetch(stations_code_url)
   if(!response){
@@ -430,7 +438,29 @@ function setup_station_code_dict(table, received_uid){
       table[Tai2Tai(key_str)] = code_str
     }
   }
-  return 0
+  */
+
+  //Access from existed JSON file
+  var target_file_name = "StationInfo.json"
+  var folder = DriveApp.getFolderById(my_folder_id);
+  var files = folder.getFiles();
+  var file = undefined
+  var file_t = undefined
+  while(files.hasNext()){
+    file_t = files.next()
+    if(target_file_name == file_t.getName()){
+      file = file_t
+      break
+    }
+  }
+  file_blob = file.getBlob()
+  file_str = file_blob.getDataAsString()
+  json_content = JSON.parse(file_str)
+  for(var i=0; i<json_content.length; i++){
+    key_str = json_content[i]["stationName"]
+    table[key_str] = json_content[i]["stationCode"]
+    table[Tai2Tai(key_str)] = json_content[i]["stationCode"]
+  }
 }
     
 function initial(table_name2code, car_class_dict, received_uid){
@@ -536,4 +566,5 @@ function release(received_uid, alert_received_msg){
 function debug(){
   var sent_message = send_msg(Author_UID, "測試測試OKOK")
   delete_msg(Author_UID, sent_message)
+  log.TWR_INFO(String(5/2))
 }
