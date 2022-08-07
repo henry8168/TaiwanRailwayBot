@@ -1,7 +1,7 @@
 # TaiwanRailwayBot
 It's a Telegram bot for looking up the timetable of Taiwan Railway.
 
-Program in Python 3 and use the API of python-telegram-bot.
+Program in Google Apps Script.
 
 
 Usage:
